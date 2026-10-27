@@ -1,0 +1,26 @@
+name: Release Geo Files
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create or Update Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete latest --yes || true
+          git tag -d latest || true
+          git push --delete origin latest || true
+          gh release create latest geoip.dat geosite.dat --title "Latest Geo Rules" --notes "Auto-generated geoip and geosite rules"
